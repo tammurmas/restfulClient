@@ -1,5 +1,12 @@
 package org.tamm.client;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,47 +18,34 @@ import org.springframework.web.client.RestTemplate;
 
 public class Client {
 	private static final Logger log = LoggerFactory.getLogger(Client.class);
-	private long interval;
-	private String host;
-
-	public long getInterval() {
-		return interval;
-	}
-
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
-
-	public Client(long interval, String host)
-	{
-		this.interval = interval;
-		this.host = host;
-	}
+	private static final String confName = "conf.properties";
+	private static final String url = "http://localhost:8080/hostservice"; 
 	
     public static void main(String args[]) throws Exception {
     	BasicConfigurator.configure();
-    	new Client(2000, "http://localhost:8080/hostservice").run();
+    	new Client().run();
     }
 
     public void run(String... strings) throws Exception {
     	
     	RestTemplate restTemplate = new RestTemplate();
-    	ServerStatus status = new ServerStatus();
-    	status.setHostId("randomId");
-    	status.setStatus("randomStatus");
+    	Request request = new Request();
+    	
+    	Map<String,String> conf = getConf();
+    	request.setHostId(getValue(conf,"hostId"));
+    	request.setInterval(Long.parseLong(getValue(conf,"interval")));
     	
     	HttpHeaders headers = new HttpHeaders();
-    	headers.add("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
-    	HttpEntity<ServerStatus> entity = new HttpEntity<ServerStatus>(status, headers);
+    	headers.add("Authorization", getValue(conf,"auth"));
+    	HttpEntity<Request> entity = new HttpEntity<Request>(request, headers);
     	
     	while(true)
     	{
     		try
     		{
-    			//ResponseEntity<ServerStatus> response = restTemplate.postForEntity(host, status, ServerStatus.class);
-    			ResponseEntity<ServerStatus> response = restTemplate.exchange(host, HttpMethod.POST, entity, ServerStatus.class);
+    			ResponseEntity<Request> response = restTemplate.exchange(url, HttpMethod.POST, entity, Request.class);
             	log.info(response.toString());
-            	Thread.sleep(interval);
+            	Thread.sleep(request.getInterval());
     		}
     		catch(Exception e)
     		{
@@ -59,4 +53,43 @@ public class Client {
     		}
     	}
     }
+    
+    private String getValue(Map<String,String> conf, String key) throws Exception
+    {
+    	String value = conf.get(key);
+    	if(value == null)
+    	{
+    		throw new Exception("Missing value in config for key \""+key+"\"");
+    	}
+    	return value;
+    }
+    
+	private Map<String, String> getConf() {
+		Properties prop = new Properties();
+		InputStream input = null;
+		Map<String,String> confValues = new HashMap<String,String>();
+
+		ClassLoader classLoader = getClass().getClassLoader();
+    	File file = new File(classLoader.getResource(confName).getFile());
+		try {
+			input = new FileInputStream(file);
+			prop.load(input);
+
+			confValues.put("auth",prop.getProperty("auth"));
+			confValues.put("interval",prop.getProperty("interval"));
+			confValues.put("hostId",prop.getProperty("hostId"));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return confValues;
+	}
+    
 }
