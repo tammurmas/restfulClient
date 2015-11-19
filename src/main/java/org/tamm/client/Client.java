@@ -26,7 +26,7 @@ public class Client {
     	new Client().run();
     }
 
-    public void run(String... strings) throws Exception {
+    public void run() throws Exception {
     	
     	RestTemplate restTemplate = new RestTemplate();
     	Request request = new Request();
@@ -49,6 +49,7 @@ public class Client {
     		}
     		catch(Exception e)
     		{
+    			log.error("Exchange exception", e);
     			e.printStackTrace();
     		}
     	}
@@ -59,7 +60,9 @@ public class Client {
     	String value = conf.get(key);
     	if(value == null)
     	{
-    		throw new Exception("Missing value in config for key \""+key+"\"");
+    		Exception e = new Exception("Missing value in config for key \""+key+"\"");
+    		log.error("Missing value in config", e);
+    		throw e;
     	}
     	return value;
     }
@@ -85,6 +88,7 @@ public class Client {
 				try {
 					input.close();
 				} catch (IOException e) {
+					log.error("IOException", e);
 					e.printStackTrace();
 				}
 			}
