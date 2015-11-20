@@ -45,13 +45,13 @@ public class Client {
     		{
     			ResponseEntity<Request> response = restTemplate.exchange(url, HttpMethod.POST, entity, Request.class);
             	log.info(response.toString());
-            	Thread.sleep(request.getInterval());
     		}
     		catch(Exception e)
     		{
     			log.error("Exchange exception", e);
     			e.printStackTrace();
     		}
+    		Thread.sleep(request.getInterval());
     	}
     }
     

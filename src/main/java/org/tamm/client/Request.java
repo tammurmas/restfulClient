@@ -4,6 +4,8 @@ public class Request {
 	private String hostId;
 	private long interval;
 	
+	public Request(){}
+	
 	public String getHostId() {
 		return hostId;
 	}
