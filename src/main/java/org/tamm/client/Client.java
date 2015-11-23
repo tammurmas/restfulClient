@@ -17,9 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class Client {
-	private static final Logger log = LoggerFactory.getLogger(Client.class);
-	private static final String confName = "conf.properties";
-	private static final String url = "http://localhost:8080/hostservice"; 
+	private static final Logger LOG = LoggerFactory.getLogger(Client.class);
+	private static final String CONF_NAME = "conf.properties";
+	private static final String URL = "http://localhost:8080/hostservice"; 
 	
     public static void main(String args[]) throws Exception {
     	BasicConfigurator.configure();
@@ -43,25 +43,25 @@ public class Client {
     	{
     		try
     		{
-    			ResponseEntity<Request> response = restTemplate.exchange(url, HttpMethod.POST, entity, Request.class);
-            	log.info(response.toString());
+    			ResponseEntity<Request> response = restTemplate.exchange(URL, HttpMethod.POST, entity, Request.class);
+    			LOG.info(response.toString());
     		}
     		catch(Exception e)
     		{
-    			log.error("Exchange exception", e);
+    			LOG.error("Exchange exception", e);
     			e.printStackTrace();
     		}
     		Thread.sleep(request.getInterval());
     	}
     }
     
-    private String getValue(Map<String,String> conf, String key) throws Exception
+    private String getValue(Map<String,String> conf, String key) throws IllegalStateException
     {
     	String value = conf.get(key);
     	if(value == null)
     	{
-    		Exception e = new Exception("Missing value in config for key \""+key+"\"");
-    		log.error("Missing value in config", e);
+    		IllegalStateException e = new IllegalStateException("Missing value in config for key \""+key+"\"");
+    		LOG.error("Missing value in config for key \""+key+"\"", e);
     		throw e;
     	}
     	return value;
@@ -73,7 +73,7 @@ public class Client {
 		Map<String,String> confValues = new HashMap<String,String>();
 
 		ClassLoader classLoader = getClass().getClassLoader();
-    	File file = new File(classLoader.getResource(confName).getFile());
+    	File file = new File(classLoader.getResource(CONF_NAME).getFile());
 		try {
 			input = new FileInputStream(file);
 			prop.load(input);
@@ -88,7 +88,7 @@ public class Client {
 				try {
 					input.close();
 				} catch (IOException e) {
-					log.error("IOException", e);
+					LOG.error("IOException", e);
 					e.printStackTrace();
 				}
 			}
