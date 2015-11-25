@@ -1,25 +1,28 @@
 package org.tamm.client;
 
 public class Request {
-	private String hostId;
-	private long interval;
+	private long hostId;
+	private Long checkInIntervalSeconds;
 	
+	public Long getCheckInIntervalSeconds() {
+		return checkInIntervalSeconds;
+	}
+
+	public void setCheckInIntervalSeconds(Long checkInIntervalSeconds) {
+		this.checkInIntervalSeconds = checkInIntervalSeconds;
+	}
+
 	public Request(){}
 	
-	public String getHostId() {
+	public long getHostId() {
 		return hostId;
 	}
-	public void setHostId(String hostId) {
+	public void setHostId(long hostId) {
 		this.hostId = hostId;
 	}
-	public long getInterval() {
-		return interval;
-	}
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
+	
 	@Override
 	public String toString() {
-		return "Request [hostId=" + hostId + ", interval=" + interval + "]";
+		return "Request [hostId=" + hostId + ", interval=" + checkInIntervalSeconds + "]";
 	}
 }
