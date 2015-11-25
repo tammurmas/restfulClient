@@ -52,11 +52,7 @@ public class Client {
     		url = conf.get("url");
     	}
     	//set interval
-    	if(conf.get("checkInIntervalSeconds") == null)
-    	{
-    		//request.setCheckInIntervalSeconds(null);
-    	}
-    	else
+    	if(conf.get("checkInIntervalSeconds") != null)
     	{
     		request.setCheckInIntervalSeconds(Long.parseLong(conf.get("checkInIntervalSeconds")));
     	}
@@ -71,8 +67,13 @@ public class Client {
     	{
     		try
     		{
-    			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-    			LOG.info("Response body: "+response.getBody());
+    			ResponseEntity<HostServiceResponse> response = restTemplate.exchange(url, HttpMethod.POST, entity, HostServiceResponse.class);
+    			HostServiceResponse resp = response.getBody();
+    			LOG.info("Response body: "+resp);
+    			if(resp != null)
+    			{
+    				request.setCheckInIntervalSeconds(resp.getCheckInIntervalSeconds());
+    			}
     		}
     		catch(HttpStatusCodeException e)
     		{
@@ -85,11 +86,6 @@ public class Client {
     		}
     		
     		try {
-    			//TODO: get interval from response body
-    			if(request.getCheckInIntervalSeconds() == null)
-    			{
-    				request.setCheckInIntervalSeconds(new Long(4));
-    			}
 				Thread.sleep(request.getCheckInIntervalSeconds()*1000);
 			} catch (InterruptedException e) {
 				LOG.error("Sleep interrupted",e);
