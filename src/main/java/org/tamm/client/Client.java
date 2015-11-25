@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -24,7 +23,6 @@ public class Client {
 	private static final String CONF_NAME = "./conf.properties";
 	
     public static void main(String args[]) throws Exception {
-    	BasicConfigurator.configure();
     	new Client().run();
     }
 
@@ -74,7 +72,7 @@ public class Client {
     		try
     		{
     			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-    			LOG.info(response.getBody());
+    			LOG.info("Response body: "+response.getBody());
     		}
     		catch(HttpStatusCodeException e)
     		{
@@ -90,9 +88,9 @@ public class Client {
     			//TODO: get interval from response body
     			if(request.getCheckInIntervalSeconds() == null)
     			{
-    				request.setCheckInIntervalSeconds(new Long(4000));
+    				request.setCheckInIntervalSeconds(new Long(4));
     			}
-				Thread.sleep(request.getCheckInIntervalSeconds());
+				Thread.sleep(request.getCheckInIntervalSeconds()*1000);
 			} catch (InterruptedException e) {
 				LOG.error("Sleep interrupted",e);
 			}
