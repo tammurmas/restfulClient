@@ -1,9 +1,9 @@
 package org.tamm.client;
 
 public class Request {
-	private long hostId;
+	private String uuid;
 	private Long checkInIntervalSeconds;
-	
+
 	public Long getCheckInIntervalSeconds() {
 		return checkInIntervalSeconds;
 	}
@@ -12,17 +12,19 @@ public class Request {
 		this.checkInIntervalSeconds = checkInIntervalSeconds;
 	}
 
-	public Request(){}
-	
-	public long getHostId() {
-		return hostId;
+	public Request() {
 	}
-	public void setHostId(long hostId) {
-		this.hostId = hostId;
+
+	public String getUuid() {
+		return uuid;
 	}
-	
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
 	@Override
 	public String toString() {
-		return "Request [hostId=" + hostId + ", interval=" + checkInIntervalSeconds + "]";
+		return "Request [uuid=" + uuid + ", interval=" + checkInIntervalSeconds + "]";
 	}
 }
