@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -41,6 +42,7 @@ public class Client {
 	private void init() throws InitializationException {
 		try {
 			loadProperties();
+			loadLogConf();
 
 			checkProperty(ConfKeys.UUID);
 			checkProperty(ConfKeys.URL);
@@ -108,6 +110,12 @@ public class Client {
 		} catch (IOException ex) {
 			LOG.error("Error reading configuration", ex);
 		}
+	}
+
+	private void loadLogConf() throws IOException {
+		Properties props = new Properties();
+		props.load(getClass().getResourceAsStream("/log4j.properties"));
+		PropertyConfigurator.configure(props);
 	}
 
 	private void printStack(Exception e) {
