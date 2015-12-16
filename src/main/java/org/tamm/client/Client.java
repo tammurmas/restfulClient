@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -26,12 +25,20 @@ public class Client {
 	URI url;
 
 	public static void main(String args[]) throws Exception {
-		Client client = new Client();
-		client.init();
-		client.run();
+		new Client().run();
 	}
 
-	public void init() throws URISyntaxException {
+	public void run() {
+		try {
+			init();
+			start();
+		} catch (InitializationException ie) {
+			LOG.error("Could not start: {}.", ie.getMessage());
+			printStack(ie);
+		}
+	}
+
+	private void init() throws InitializationException {
 		try {
 			loadProperties();
 
@@ -39,6 +46,7 @@ public class Client {
 			checkProperty(ConfKeys.URL);
 
 			url = new URI(properties.getProperty(ConfKeys.URL));
+			request.setUuid(properties.getProperty(ConfKeys.UUID));
 
 			if (!StringUtils.isEmpty(properties.getProperty(ConfKeys.INTERVAL_SECONDS))) {
 				try {
@@ -52,12 +60,11 @@ public class Client {
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Could not start: {}.", e.getMessage());
-			printStack(e);
+			throw new InitializationException(e);
 		}
 	}
 
-	public void run() {
+	private void start() {
 		try {
 			LOG.info("Started");
 			HttpEntity<Request> entity = new HttpEntity<Request>(request);
