@@ -81,8 +81,8 @@ public class Client {
 							.longValue() != resp.getCheckInIntervalSeconds().longValue()) {
 						LOG.info("Server did not like my interval time ({} seconds) and wanted me to use {}.",
 								request.getCheckInIntervalSeconds(), resp.getCheckInIntervalSeconds());
+						request.setCheckInIntervalSeconds(resp.getCheckInIntervalSeconds());
 					}
-					request.setCheckInIntervalSeconds(resp.getCheckInIntervalSeconds());
 					if (showBackOnline) {
 						LOG.info("Connected to server successfully");
 						showBackOnline = false;
