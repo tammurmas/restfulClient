@@ -70,18 +70,26 @@ public class Client {
 		try {
 			LOG.info("Started");
 			HttpEntity<Request> entity = new HttpEntity<Request>(request);
-
+			boolean showBackOnline = false;
 			while (true) {
 				try {
 					ResponseEntity<HostServiceResponse> response = restTemplate.exchange(url, HttpMethod.POST, entity,
 							HostServiceResponse.class);
 					HostServiceResponse resp = response.getBody();
 					LOG.debug("Response body: " + resp);
-					if (resp != null) {
-						request.setCheckInIntervalSeconds(resp.getCheckInIntervalSeconds());
+					if (request.getCheckInIntervalSeconds() == null || request.getCheckInIntervalSeconds()
+							.longValue() != resp.getCheckInIntervalSeconds().longValue()) {
+						LOG.info("Server did not like my interval time ({} seconds) and wanted me to use {}.",
+								request.getCheckInIntervalSeconds(), resp.getCheckInIntervalSeconds());
+					}
+					request.setCheckInIntervalSeconds(resp.getCheckInIntervalSeconds());
+					if (showBackOnline) {
+						LOG.info("Connected to server successfully");
+						showBackOnline = false;
 					}
 				} catch (RestClientException e) {
-					LOG.error("Exception while sending request: {}.", e.getMessage());
+					showBackOnline = true;
+					LOG.error("Error: {}.", e.getMessage());
 					printStack(e);
 				}
 
